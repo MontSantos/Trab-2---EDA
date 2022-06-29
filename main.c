@@ -14,5 +14,9 @@
 int main(void)
 {
     Mat_grafo *mat = cria_grafo(41);
+    char *mapa = le_arquivo(mat);
+    prt_grafo(mat);
     lib_grafo(mat);
+    printf("%s", mapa);
+    free(mapa);
 }

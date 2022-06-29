@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "grafo.h"
-
 
 struct mat_grafo
 {
@@ -28,6 +28,16 @@ Mat_grafo *cria_grafo(int vrt) //funciona bem
     return mat_vet;
 }
 
+void prt_grafo(Mat_grafo *mat)
+{
+    for (int i = 0; i < mat->vrt; i++) {
+        for (int j = 0; j < mat->vrt; j++) {
+            printf("%.f i = %d  j = %d\n", mat->mat[i][j], i, j);
+        }
+    }
+
+}
+
 void lib_grafo(Mat_grafo *mat) //funciona bem
 {
     for (int i = 0; i < mat->vrt; i++) {
@@ -36,4 +46,45 @@ void lib_grafo(Mat_grafo *mat) //funciona bem
     }
     free (mat->mat);
     free (mat);
+}
+
+char *le_arquivo(Mat_grafo *mat) //le o arquivo, cria uma sting contendo todos os caracteres, preenche a matriz principal com o peso do caracter dela
+{
+    char c;
+    char *str;
+    FILE *arq;
+    int i = 0, j = 0, k = 0;
+
+    arq = fopen("mapa.txt", "r");
+    if(arq == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+    str = (char *) calloc(mat->vrt * mat->vrt, sizeof(char));
+    while (!feof(arq)) {
+        c = getc(arq);
+        if (c != EOF) {
+            if (c == 'X') {
+                mat->mat[i][j] = 100;
+            }
+            else if (c == '.')
+                mat->mat[i][j] = 1;
+            else if (c == 'I')
+                mat->mat[i][j] = 0;
+            else if (c == 'F')
+                mat->mat[i][j] = 0;
+            else
+                continue;
+            str[k] = c;
+            j++;
+            k++;
+            if (j > 40) {
+                j = 0;
+                i++;
+            }
+        }
+    }
+    fclose(arq);
+
+    return str;
 }
