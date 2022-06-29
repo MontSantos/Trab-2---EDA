@@ -28,12 +28,6 @@ Mat_grafo *cria_grafo(int vrt) //funciona bem
     return mat_vet;
 }
 
-void cria_aresta(Mat_grafo *mat, int v1, int v2, int peso) //fez sentido para mim, porém não sei se funciona.
-{
-   mat->mat[v1][v2] = peso;
-   mat->mat[v2][v1] = peso;
-}
-
 void lib_grafo(Mat_grafo *mat) //funciona bem
 {
     for (int i = 0; i < mat->vrt; i++) {
