@@ -27,7 +27,12 @@ int main(void)
     Mat_grafo *mat = cria_grafo(41);
     char *mapa = le_arquivo(mat);
     float** djk = djk_percorre(mat,39,1);
-    print_djk(djk);
+    //print_djk(djk);
+
+    int i_target = 1, j_target = 39; //localizacao da letra F no grafo
+    printf("Dijkstra: A menor distancia (ate chegar no alvo) é de %.1f\n",djk[i_target][j_target]);
+
+
 
     //prt_grafo(mat);
     lib_grafo(mat);

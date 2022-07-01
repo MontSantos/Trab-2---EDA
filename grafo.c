@@ -98,7 +98,7 @@ char *le_arquivo(Mat_grafo *mat) //le o arquivo, cria uma sting contendo todos o
 
 /* DIJKSTRA */
 
-int foi_visitado(int ** visitados, int i, int j){
+int foi_visitado(float ** visitados, int i, int j){
 
     if(visitados[i][j])
         return 1;
@@ -188,39 +188,19 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
     visitados = v->mat;
     distancias = d->mat;
 
-    //int curr[2]; //no corrente
-    //curr[0] = -1;
-    //curr[1] = -1;
-    
     float curr = 0; //o primeiro no corrente sempre é igual a 0, pois a distancia pra ele mesmo é igual a zero
 
     int i = i_start;
     int j = j_start;
 
-    float cima, baixo, esq, dir;
-    //42 foi um valor absolutamente arbitrario. Trocar ele por outra coisa (acho q nao precisa trocar)
-    cima = 42;
-    baixo = 42;
-    esq = 42;
-    dir = 42;
-
-
-    while(1){ //esse while ta zoado ; isso eh so um rascunho ; roda para cada no corrente do grafo
-        
-        //int direction = -1; //qual direcao ele devera mudar depois de tudo
-        float menorValor = FLT_MAX;
-        //int dist_atual = curr;
-
-        //if(dist_atual != INT_MAX){ //se nao houvesse isso, ia estourar o int pelo tamanho dele quando somassemos o vizinho
-        //}
-
+    while(1){ 
 
         if( (i-1) >= 0){ //caso exista um no acima
 
-            cima = mat->mat[i-1][j]; //valor na matriz input
+            float cima = mat->mat[i-1][j]; //valor na matriz input
             
 
-            if((cima + curr) < distancias[i-1][j]){//verifica se ele esta apto para ser o proximo no a ser percorrido (menor valor e ainda nao foi visitado)
+            if((cima + curr) < distancias[i-1][j] && !foi_visitado(visitados,i,j)){//verifica se ele esta apto para ser o proximo no a ser percorrido (menor valor e ainda nao foi visitado)
                 distancias[i-1][j] = cima + curr;
                 
             } 
@@ -228,18 +208,18 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
             
         if( (i+1) < 41){
 
-            baixo = mat->mat[i+1][j];
+            float baixo = mat->mat[i+1][j];
 
-            if((baixo + curr) < distancias[i][j]){
+            if((baixo + curr) < distancias[i+1][j] && !foi_visitado(visitados,i,j)){
                 distancias[i+1][j] = baixo + curr;
             
             }
         }
         if( (j-1) >= 0){
             
-            esq = mat->mat[i][j-1];
+            float esq = mat->mat[i][j-1];
 
-            if(esq < menorValor){
+            if((esq + curr) < distancias[i][j-1] && !foi_visitado(visitados,i,j)){
                 distancias[i][j-1] = esq + curr;
                 
             }
@@ -247,10 +227,10 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
         }
         if( (j+1) < 41){
             
-            dir = mat->mat[i][j+1];
+            float dir = mat->mat[i][j+1];
 
-            if(dir< menorValor){
-                distancias[i][j-1] = dir + curr;
+            if((dir + curr) < distancias[i][j+1] && !foi_visitado(visitados,i,j)){
+                distancias[i][j+1] = dir + curr;
                 
             }
 
@@ -272,28 +252,9 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
         
         free(temp);
 
-            //troca o i e o j
-            //mudar o valor de curr
-
-
-        /*
-        switch (direction) //atualiza o no corrente
-        {
-            visitados[i][j] = 1; // seta que ele foi visitado, pois no fim do loop este sera o no corrente
-
-        case 0:
-            i-=1;
-        case 1:
-            i+=1;
-        case 2:
-            j-=1;
-        case 3:
-            j+=1;
-        }
-        */
     }
 
-    //free(v);
-
+    free(v);
+    free(d);
     return distancias;
 }
