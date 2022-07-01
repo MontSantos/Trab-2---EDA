@@ -3,9 +3,12 @@
 #include <string.h>
 #include "grafo.h"
 #include <limits.h>
+#include <float.h>
 
 #define LIN 41 // linhas
 #define COL 41 // colunas
+ 	
+
 
 struct mat_grafo
 {
@@ -108,147 +111,189 @@ int encontra_menor(int v[], int tam){
     int menor = INT_MAX;
     int lever = 0;
     for(int i = 0; i<tam; i++){
-        if(v[i] < menor)
+        if(v[i] < menor){
             menor = v[i];
             lever = 1;
+        }
     }
     if(lever == 0)
         exit(1); //erro por nao ter encontrado nenhum menor valor; Precaucao por conta do int menor ser INT_MAX por predefinicao
 
     return menor;
 }
+float* prox_curr(float **visitados, float** distancias){
+
+    float *menor = (float*) malloc(2* (sizeof(float)));
+    float menor_valor = FLT_MAX;
+
+    for(int i = 0; i< LIN; i++){
+        for(int j = 0; j<COL; j++){
+
+            if(distancias[i][j] < menor_valor && visitados[i][j] == 0){
+                menor[0] = i, menor[1] = j;
+                menor_valor = distancias[i][j];
+            }
+        }
+    }
+    if(menor_valor == FLT_MAX)
+        return NULL;
+    return menor;
+}
 
 
-void djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira leitura do djk
 
+Mat_grafo * cria_visitados(void){
+
+    Mat_grafo *visitados = cria_grafo(41);
+
+    //int **visitados = (int**) malloc(LIN * sizeof(int*));
     /*
-    TO DO:
-    -   dist = curr + vizinho (atualizar o valor disso no valor da lista de distancias)
-    
+    for(int i = 0; i<LIN; i++){
+        for(int j = 0; i < COL; j++){
+            visitados->mat[i][j] = 0; //quando uma das paradas for visitada, isso aqui é == a 1
+        }
+    }
     */
-
-
-    int ** visitados, **distancias;
-    visitados = cria_visitados();
-    distancias = cria_distancias();
-
-    int curr[2]; //no corrente
-    curr[0] = -1;
-    curr[1] = -1;
+    return visitados;
     
+}
+
+Mat_grafo * cria_distancias(int i_init, int j_init){
+
+    Mat_grafo* distancias = cria_grafo(41);
+    
+
+    for(int i = 0; i<LIN; i++){
+        for(int j = 0; j< COL; j++){
+            distancias->mat[i][j] = FLT_MAX; // "infinito" segundo o slide do baffa sobre dijkstra
+        }
+    }
+    distancias->mat[i_init][j_init] = 0;
+
+    return distancias;
+}
+
+
+
+float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira leitura do djk
+
+
+    Mat_grafo *v ,*d;
+    float ** visitados, **distancias;
+
+
+    v = cria_visitados();
+    d = cria_distancias(i_start,j_start);
+
+    visitados = v->mat;
+    distancias = d->mat;
+
+    //int curr[2]; //no corrente
+    //curr[0] = -1;
+    //curr[1] = -1;
+    
+    float curr = 0; //o primeiro no corrente sempre é igual a 0, pois a distancia pra ele mesmo é igual a zero
+
     int i = i_start;
     int j = j_start;
 
     float cima, baixo, esq, dir;
-    //42 foi um valor absolutamente arbitrario. Trocar ele por outra coisa
+    //42 foi um valor absolutamente arbitrario. Trocar ele por outra coisa (acho q nao precisa trocar)
     cima = 42;
     baixo = 42;
     esq = 42;
     dir = 42;
 
-    int nextNode[2]; // par ordenado arbitrario ; representa o proximo no corrente na matriz
-    nextNode[0] = -1;
-    nextNode[1] = -1;
-
-    int t1 = 0;
-    int t2 = 0;
-
 
     while(1){ //esse while ta zoado ; isso eh so um rascunho ; roda para cada no corrente do grafo
         
-        int direction = -1; //qual direcao ele devera mudar depois de tudo
-        int menorValor = INT_MAX;
-        int dist_atual = distancias[curr[0]][curr[1]];
+        //int direction = -1; //qual direcao ele devera mudar depois de tudo
+        float menorValor = FLT_MAX;
+        //int dist_atual = curr;
 
         //if(dist_atual != INT_MAX){ //se nao houvesse isso, ia estourar o int pelo tamanho dele quando somassemos o vizinho
         //}
 
 
         if( (i-1) >= 0){ //caso exista um no acima
-            cima = mat->mat[i-1][j];
-           
-            if(cima < menorValor && !foi_visitado(visitados,i-1,j)){//verifica se ele esta apto para ser o proximo no a ser percorrido (menor valor e ainda nao foi visitado)
-                menorValor = cima;
+
+            cima = mat->mat[i-1][j]; //valor na matriz input
+            
+
+            if((cima + curr) < distancias[i-1][j]){//verifica se ele esta apto para ser o proximo no a ser percorrido (menor valor e ainda nao foi visitado)
+                distancias[i-1][j] = cima + curr;
                 
-                direction = 0;
             } 
         }
             
         if( (i+1) < 41){
-            baixo = mat->mat[i+1][j];
-            if(baixo < menorValor && !foi_visitado(visitados,i+1,j)){
-                menorValor = baixo;
 
-                visitados[i][j] = 1; // seta que ele foi visitado, pois no fim do loop este sera o no corrente
-                
-                direction = 1
+            baixo = mat->mat[i+1][j];
+
+            if((baixo + curr) < distancias[i][j]){
+                distancias[i+1][j] = baixo + curr;
+            
             }
         }
         if( (j-1) >= 0){
+            
             esq = mat->mat[i][j-1];
-            if(esq < menorValor && !foi_visitado(visitados,i,j-1)){
-                menorValor = esq;
+
+            if(esq < menorValor){
+                distancias[i][j-1] = esq + curr;
                 
-                direction = 2;
             }
 
         }
         if( (j+1) < 41){
+            
             dir = mat->mat[i][j+1];
-            if(dir< menorValor && !foi_visitado(visitados,i,j+1)){
-                menorValor = dir;
+
+            if(dir< menorValor){
+                distancias[i][j-1] = dir + curr;
                 
-                direction = 3;
             }
 
+
+
         }
 
+        //hora de definir o proximo no corrente
+        visitados[i][j] = 1;
+
+        float * temp = prox_curr(visitados,distancias);
+        if(temp == NULL) //nao ha mais nos a serem percorridos
+            break;
+            
+        i = (int) temp[0];
+        j = (int) temp[1];
+
+        curr = distancias[i][j];
+        
+        free(temp);
+
+            //troca o i e o j
+            //mudar o valor de curr
+
+
+        /*
         switch (direction) //atualiza o no corrente
         {
-            visitados[curr[0]][curr[1]] = 1; // seta que ele foi visitado, pois no fim do loop este sera o no corrente
+            visitados[i][j] = 1; // seta que ele foi visitado, pois no fim do loop este sera o no corrente
 
         case 0:
-            curr[0] -=1;
             i-=1;
         case 1:
-            curr[0] +=1;
             i+=1;
         case 2:
-            curr[1] -=1;
             j-=1;
         case 3:
-            curr[1] +=1;
             j+=1;
         }
-    }
-    
-
-}
-
-int ** cria_visitados(void){
-
-    int **visitados = (int**) malloc(LIN * sizeof(int*));
-    
-    for(int i = 0; i<LIN; i++){
-        visitados[i] = (int*) malloc( COL * sizeof(int));
-        for(int j = 0; i < COL; j++){
-            visitados[i][j] = 0; //quando uma das paradas for visitada, isso aqui é == a 1
-        }
+        */
     }
 
-    return visitados;
-}
-
-int ** cria_distancias(void){
-
-    int** distancias = (int**) malloc(LIN*sizeof(int*));
-
-    for(int i = 0; i<LIN; i++){
-        distancias[i] = (int*) malloc(COL* sizeof(int));
-        for(int j = 0; j< COL; j++){
-            distancias[i][j] = INT_MAX; // "infinito" segundo o slide do baffa sobre dijkstra
-        }
-    }
+    //free(v);
 
     return distancias;
 }
