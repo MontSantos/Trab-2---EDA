@@ -52,11 +52,10 @@ int main(void)
     printf("TEMPO EM %f SEGUNDOS\n=======\n",((double)t)/CLOCKS_PER_SEC);
     free(visitados);
 
-    printf("Hello there!");
 
-    int fw = fw_percorre(mat);
-    printf("Floyd-Warshall: Quantidade de nos visitados: %d",fw);
-
+    float** fw = fw_percorre(mat,1,39,39,1);
+    printf("Floyd-Warshall: Quantidade de nos visitados: %d\n",conta_visitados(fw)*(41*41));
+    printf("menor distancia: %.1f\n", fw[39][1]);
     //prt_grafo(mat);
     lib_grafo(mat);
     libera_matriz(djk,41,41);

@@ -126,14 +126,16 @@ int foi_visitado(float ** visitados, int i, int j){
 
 }
 
-int encontra_menor(float v[], int tam){
+int encontra_menor(float ** v, int tam){
     
     int menor = INT_MAX;
     int lever = 0;
     for(int i = 0; i<tam; i++){
-        if(v[i] < menor && v[i] != 0){
-            menor = v[i];
+        for(int j = 0;i<tam;i++){
+            if(v[i][j] < menor && v[i][j] != 0){
+            menor = v[i][j];
             lever = 1;
+        }
         }
     }
     if(lever == 0)
@@ -287,32 +289,41 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start, float** visitados
 
 /* FLOYD WARSHALL*/
 
-int fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int target_j){
+
+float** fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int target_j){
 
 
-    float *menores_valores = (float*) malloc(sizeof(float) * (LIN*COL)); //quantidade de matrizes e seus menores valores
+    float ***menores_valores = (float***) malloc(sizeof(float**) * (LIN*COL)); //quantidade de matrizes e seus menores valores
+    printf("inicializando tripla\n");
+   // ini_tripla(menores_valores);
+    printf("fim\n");
+
     float** visitados = NULL;
     float** ret = NULL;
 
-    int nos = 0;
-    int mini_i = 0, mini_j = 0;
+    int nos = 0; //quantidade de nos 
+    int mini_i = 0, mini_j = 0; //indices para percorrer as matrizes
 
     //printf("algoritmo rodando, aguarde...");
     for(int i = 0; i <(LIN*COL); i++){
-        
+
+
         if(mini_j > LIN){
             mini_i++; //avanca uma linha
             mini_j = 0;
         }
-
         ret = djk_percorre(mat,mini_i,mini_j,visitados);
+        visitados = cria_visitados()->mat;
+        menores_valores[i] = ret;
+
         nos += conta_visitados(ret);
         printf("%d\n",nos);
 
         mini_j++;
+        free(visitados);
     }
-    
-    float resposta = encontra_menor(menores_valores, (LIN*COL));
-    printf("menor numero de passos: %.1f",resposta);
-    return resposta;
+    int resposta = (int) menores_valores[(LIN*init_i) + init_j][target_i][target_j + 1];
+    printf("indices : %d %d %d",(LIN*init_i) + init_j,target_i,target_j);
+
+    return menores_valores[(LIN*init_i) + init_j];
 }

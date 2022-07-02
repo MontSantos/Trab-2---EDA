@@ -10,7 +10,7 @@ void prt_grafo(Mat_grafo *mat);
 void lib_grafo(Mat_grafo *mat);
 char *le_arquivo(Mat_grafo *mat);
 int conta_visitados(float** matrix);
-int fw_percorre(Mat_grafo * mat);
+float** fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int target_j);
 
 /*DJK*/
 float **djk_percorre(Mat_grafo *mat, int i_start, int j_start, float** visitados);
