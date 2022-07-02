@@ -294,9 +294,7 @@ float** fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int t
 
 
     float ***menores_valores = (float***) malloc(sizeof(float**) * (LIN*COL)); //quantidade de matrizes e seus menores valores
-    printf("inicializando tripla\n");
-   // ini_tripla(menores_valores);
-    printf("fim\n");
+    printf("contando matrizes...\n");
 
     float** visitados = NULL;
     float** ret = NULL;
@@ -317,13 +315,13 @@ float** fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int t
         menores_valores[i] = ret;
 
         nos += conta_visitados(ret);
-        printf("%d\n",nos);
+       // printf("%d\n",nos);
 
         mini_j++;
         free(visitados);
     }
     int resposta = (int) menores_valores[(LIN*init_i) + init_j][target_i][target_j + 1];
-    printf("indices : %d %d %d",(LIN*init_i) + init_j,target_i,target_j);
+    //printf("indices : %d %d %d",(LIN*init_i) + init_j,target_i,target_j);
 
     return menores_valores[(LIN*init_i) + init_j];
 }

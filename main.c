@@ -36,7 +36,7 @@ int main(void)
     Mat_grafo *mat = cria_grafo(41);
     char *mapa = le_arquivo(mat);
     
-    clock_t t;
+    clock_t t, t2, t3;
     t = clock();
 
     float** visitados = NULL;
@@ -52,10 +52,14 @@ int main(void)
     printf("TEMPO EM %f SEGUNDOS\n=======\n",((double)t)/CLOCKS_PER_SEC);
     free(visitados);
 
-
+    t2 = clock();
     float** fw = fw_percorre(mat,1,39,39,1);
     printf("Floyd-Warshall: Quantidade de nos visitados: %d\n",conta_visitados(fw)*(41*41));
     printf("menor distancia: %.1f\n", fw[39][1]);
+    t2 = clock() - t2;
+    printf("TEMPO EM %f SEGUNDOS\n=======\n",((double)t2)/CLOCKS_PER_SEC);
+
+
     //prt_grafo(mat);
     lib_grafo(mat);
     libera_matriz(djk,41,41);
