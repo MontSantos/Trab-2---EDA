@@ -7,8 +7,13 @@
 
 #define LIN 41 // linhas
 #define COL 41 // colunas
- 	
 
+/*****************************************
+ *
+ * TRAB 2
+ * Guilherme Santos - 2010617
+ * João Victor Godinho - 2011401
+ *****************************************/
 
 struct mat_grafo
 {
@@ -43,6 +48,21 @@ void prt_grafo(Mat_grafo *mat)
         }
     }
 
+}
+
+int conta_visitados(float** matrix){
+    int nos = 0;
+
+    for(int i = 0; i < 41;i++){
+        for(int j = 0; j < 41;j++){
+            if(matrix[i][j] != FLT_MAX)
+                nos++;
+            
+        }
+    }
+
+    //printf("FIM DO ALGORITMO, QTD DE NOS VISITADOS: %d\n",nos);
+    return nos;
 }
 
 void lib_grafo(Mat_grafo *mat) //funciona bem
@@ -106,12 +126,12 @@ int foi_visitado(float ** visitados, int i, int j){
 
 }
 
-int encontra_menor(int v[], int tam){
+int encontra_menor(float v[], int tam){
     
     int menor = INT_MAX;
     int lever = 0;
     for(int i = 0; i<tam; i++){
-        if(v[i] < menor){
+        if(v[i] < menor && v[i] != 0){
             menor = v[i];
             lever = 1;
         }
@@ -175,12 +195,12 @@ Mat_grafo * cria_distancias(int i_init, int j_init){
 
 
 
-float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira leitura do djk
+float **djk_percorre(Mat_grafo *mat, int i_start, int j_start, float** visitados){ //faz a primeira leitura do djk
 
 
     Mat_grafo *v ,*d;
-    float ** visitados, **distancias;
-
+    float** distancias;
+    int nos = 0; //quantidade de nos visitados
 
     v = cria_visitados();
     d = cria_distancias(i_start,j_start);
@@ -240,6 +260,7 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
 
         //hora de definir o proximo no corrente
         visitados[i][j] = 1;
+        nos++;
 
         float * temp = prox_curr(visitados,distancias);
         if(temp == NULL) //nao ha mais nos a serem percorridos
@@ -256,5 +277,42 @@ float **djk_percorre(Mat_grafo *mat, int i_start, int j_start){ //faz a primeira
 
     free(v);
     free(d);
+    
     return distancias;
+}
+
+/* A* */
+
+
+
+/* FLOYD WARSHALL*/
+
+int fw_percorre(Mat_grafo * mat, int init_i, int init_j, int target_i, int target_j){
+
+
+    float *menores_valores = (float*) malloc(sizeof(float) * (LIN*COL)); //quantidade de matrizes e seus menores valores
+    float** visitados = NULL;
+    float** ret = NULL;
+
+    int nos = 0;
+    int mini_i = 0, mini_j = 0;
+
+    //printf("algoritmo rodando, aguarde...");
+    for(int i = 0; i <(LIN*COL); i++){
+        
+        if(mini_j > LIN){
+            mini_i++; //avanca uma linha
+            mini_j = 0;
+        }
+
+        ret = djk_percorre(mat,mini_i,mini_j,visitados);
+        nos += conta_visitados(ret);
+        printf("%d\n",nos);
+
+        mini_j++;
+    }
+    
+    float resposta = encontra_menor(menores_valores, (LIN*COL));
+    printf("menor numero de passos: %.1f",resposta);
+    return resposta;
 }

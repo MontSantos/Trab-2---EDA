@@ -10,6 +10,7 @@
 #include <math.h>
 #include <limits.h>
 #include "grafo.h"
+#include <float.h>
 
 void print_djk(float **djk){
 
@@ -21,21 +22,45 @@ void print_djk(float **djk){
     }
 }
 
+void libera_matriz(float ** m,int lin, int col){
+    for(int i = 0; i< lin; i++){
+        free(m[i]);
+    }
+    free(m);
+}
+
 
 int main(void)
 {
+    printf("=======\n");
     Mat_grafo *mat = cria_grafo(41);
     char *mapa = le_arquivo(mat);
-    float** djk = djk_percorre(mat,39,1);
+    
+    clock_t t;
+    t = clock();
+
+    float** visitados = NULL;
+    float** djk = djk_percorre(mat,39,1,visitados);
     //print_djk(djk);
+    t = clock() - t;
+
 
     int i_target = 1, j_target = 39; //localizacao da letra F no grafo
+
+    conta_visitados(djk);
     printf("Dijkstra: A menor distancia (ate chegar no alvo) é de %.1f\n",djk[i_target][j_target]);
+    printf("TEMPO EM %f SEGUNDOS\n=======\n",((double)t)/CLOCKS_PER_SEC);
+    free(visitados);
 
+    printf("Hello there!");
 
+    int fw = fw_percorre(mat);
+    printf("Floyd-Warshall: Quantidade de nos visitados: %d",fw);
 
     //prt_grafo(mat);
     lib_grafo(mat);
+    libera_matriz(djk,41,41);
     //printf("%s", mapa);
     free(mapa);
+    
 }
